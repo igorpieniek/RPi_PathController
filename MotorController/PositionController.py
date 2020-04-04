@@ -1,8 +1,13 @@
 import math
 import numpy as np
 
+
 class PositionController(object):
-    def __init__(self ):
+    def __init__(self, motorControler ):
+        self._motorControler = motorControler
+        self._lastLocation = Position(x = 0, y = 0, angle = 0)
+
+        self._timeout = 1 # timeout do wiadomosci
         self._wheelbase = 0.2127 #rozstaw kol w [m]
         self._wheelDiameter = 0.0898 # srednica kola [m]
         self._impulsesPerRevolution= 3600 # ilosc impulsow enkodera na obrot(przelozenie * ilosc impulsow na obrot walu silnika)
@@ -11,9 +16,10 @@ class PositionController(object):
 
         self._lastMeasure = {'L' : np.uint16(0), 'R' : np.uint16(0)}
 
-        self._lastLocation = Position(x = 0, y = 0, angle = 0)
+
     #-------------MAIN PROCESS FUNCTIONS-----------------------------------------------------------------------
     def getCoordinates(self):
+        self._updateMeasurments()
         SR = self._encoderConversion('R') 
         SL = self._encoderConversion('L')
         self._lastLocation = self._globalCoordinate(self._lastLocation, SL, SR)
@@ -34,10 +40,8 @@ class PositionController(object):
         return numOfImpulses
 
     def _getCurrentImpulses(self,motor):
-        temp = input('Enter imp motor '+motor+ ': ' )
-        return np.uint16(temp)
-        if motor=='L': return 0#getmotorimpulses[motor] (function from myserial.py)
-        else: return 1          #getmotorimpulses[motor] (function from myserial.py)
+        if motor=='L': return self._impulsesL
+        else:          return self._impulsesR       
 
     def _encoderConversion(self, motor):
         currentImp = self._getCurrentImpulses(motor)
@@ -66,6 +70,11 @@ class PositionController(object):
 
         fi_out = loc.angle + lastPos.angle 
         return Position(x = x_out, y = y_out, angle = fi_out )
+
+    def _updateMeasurments(self):
+        self._rawData = self._motor_motorControler.WaitOnMeasurement(1)
+        self._impulsesL = np.uint16(self._rawData[3])
+        self._impulsesR = np.uint16(self._rawData[4])
 
 
 

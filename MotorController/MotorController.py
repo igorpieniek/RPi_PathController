@@ -1,18 +1,32 @@
-import math
-import numpy as np
+#!/usr/bin/env python
+
+import rospy
+import threading
+from std_msgs.msg import Float32MultiArray
+from MainController import *
+from myserial import *
+
+# ROS names
+nodeName = 'PathController'
+subName = "/matlab_velocity"
+
+# COM
+com = MotorControler('COM1')
+
+def callback(commandMessage):
+    controller = MainController(commandMessage, com) 
+	rospy.loginfo('New path received')
+    while status:
+        output = controller.mainProcess()
+        if not output['status']: break
+        rospy.loginfo('Vel_R = '+ str( round( output['VR'], 2 )) 
+                      + ' Vel_L = ' + str( round( output['VL'], 2 )) )
 
 
+def listener():
+    rospy.init_node(nodeName, anonymous = True)
+    rospy.Subscriber(subName, Float32MultiArray , callback)
+    rospy.spin()
 
-
-#all =[]
-#import matplotlib.pyplot as plt
-#for k in range(10):
-#    temp = a.getCoordinates()
-#    print('X ={:.3f}, Y={:.3f}, angle={:.3f} '.format(temp['x'],  temp['y'],  temp['angle']) )
-#    all.append(temp)
-
-
-#allX = [d['x'] for d in all]
-#allY = [d['y'] for d in all]
-#plt.plot(allX,allY, 'r.' )
-#plt.show()
+if __name__ == '__main__':
+    listener()

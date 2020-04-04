@@ -6,10 +6,11 @@ class MainController(object):
     """description of class"""
     def __init__(self, path, motorControlerObj):
         self._rawPath = path
-        self._positionControl = PositionController()
+        self._motorControler = motorConrolerObj
+        self._positionControl = PositionController(motorConrolerObj)
+
         self._path = self._convertPath()
         self._setMargin()
-        self._motorControler = motorConrolerObj
 
         self._k_st = 9 # parametr w poprawce stanleya <1,10>
         self._k_con = 0.7 # parametr przypoprawce sterowania skrętu <0.5, 1>
@@ -21,9 +22,11 @@ class MainController(object):
         pathPoint, dist = self._getClosestPathPoint(pos)
         if pathPoint == None:
             self._stopMotors()
-            return
+            return {'status': False }
         vel = self._mainConversion(pos, pathPoint, dist)
         self._setMotorsPWM(vel)
+        return {'status':True, 'VR': vel['R'], 'VL':vel['L']}
+        
 
     #---------------CONVERTION FUNCTIONS------------------------------------------
     # Konwertuje sciezke na sciezke w lokalnym ukladzie wspolrzednych pierwszego punktu sciezki    
