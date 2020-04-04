@@ -96,11 +96,11 @@ class MainController(object):
     def _get2PointsDist(self,x1,y1,x2,y2):
         return math.sqrt((x2 - x1)**2 + (y2 - y1)**2)  
     
-    def _globalToLocalCoordinates(self, x_ref, y_ref, angle_ref, x,y, angle  ):
-        x_out =  (x - x_ref) * math.cos(angle_ref) + (y - y_ref) * math.sin(angle_ref) 
-        y_out = -(x - x_ref) * math.sin(angle_ref) + (y - y_ref) * math.cos(angle_ref) 
-        angle_out = angle - angle_ref
-        return {'x':x_out, 'y': y_out, 'angle': angle_out}
+    def _globalToLocalCoordinates(self, pointRef, point  ):
+        x_out =  (point.x - pointRef.x ) * math.cos( pointRef.angle ) + (point.y - pointRef.y) * math.sin( pointRef.angle ) 
+        y_out = -(point.x - pointRef.x ) * math.sin( pointRef.angle ) + (point.y - pointRef.y) * math.cos( pointRef.angle ) 
+        angle_out = point.angle - pointRef.angle
+        return Position(x = x_out, y = y_out, angle = angle_out )
 
    
 

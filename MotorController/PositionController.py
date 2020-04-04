@@ -11,18 +11,14 @@ class PositionController(object):
 
         self._lastMeasure = {'L' : np.uint16(0), 'R' : np.uint16(0)}
 
-        self._lastLocation = {'x': 0, 'y' : 0, 'angle' : 0}
+        self._lastLocation = Position(x = 0, y = 0, angle = 0)
     #-------------MAIN PROCESS FUNCTIONS-----------------------------------------------------------------------
     def getCoordinates(self):
         SR = self._encoderConversion('R') 
         SL = self._encoderConversion('L')
-        coor = self._globalCoordinate(self._lastLocation['x'],
-                                      self._lastLocation['y'],
-                                      self._lastLocation['angle'],
-                                      SL,
-                                      SR)
-        self._lastLocation = {'x': coor['x'], 'y' : coor['y'], 'angle' : coor['angle']}
-        return {'x': coor['x'], 'y' : coor['y'], 'angle' : coor['angle']}
+        self._lastLocation = self._globalCoordinate(self._lastLocation, SL, SR)
+ 
+        return self._lastLocation
     #-------------LOW LEVEL CONVERSION FUNCTIONS---------------------------------------------------------------
     def _getSign(self, diff):
         if diff > self._halfUint16: return -1 # jazda do tylu
@@ -49,23 +45,33 @@ class PositionController(object):
         self._lastMeasure[motor] = currentImp
         return S
     #-------------HIGH LEVEL CONVERSION FUNCTIONS---------------------------------------------------------------
-    def _localCoordinate(self,S1, S2):
-        if S1 == S2 and S1 == 0: return {'x':0, 'y':0, 'fi': 0, 'R':0 }
-        elif S1 == S2:
-            return {'x':0, 'y':S1, 'fi': 0, 'R':0 }
+    # na podstawie przesuniecia drogi obu kół określa przemieszczenie względem ostatniego pomiaru
+    def _localCoordinate(self,SL, SR):
+        if SL == SR and SL == 0: return Position(x = 0, y = 0, angle = 0)
+        elif SL == SR:
+            return Position(x = 0, y = SL, angle = 0)
         else:
-            fi = ( S1 - S2 ) / self._wheelbase
-            R = ( (S1 * self._wheelbase) /  (S1 - S2) ) - (0.5* self._wheelbase)
+            fi = ( SL - SR ) / self._wheelbase
+            R = ( (SL * self._wheelbase) /  (SL - SR) ) - (0.5* self._wheelbase)
             y = R * math.sin( fi )
             x =  y/ math.tan( 0.5*( math.pi-fi) )
             fi *= -1
-            return{'x':x, 'y':y,'fi': math.degrees(fi), 'R':R }
+            return Position(x = x, y = y, angle = fi )
+
+    # okresla aktualną pozycje na podstawie poprzedniej pozycji oraz drogi jaka przebyly kola robota
+    def _globalCoordinate(self, lastPos, SL, SR):
+        loc = self._localCoordinate(SL,SR)
+        x_out = lastPos.x + ( loc.x * math.cos( lastPos.angle ) ) - (loc.y * math.sin( lastPos.angle ) )
+        y_out = lastPos.y + ( loc.x * math.sin( lastPos.angle ) ) + (loc.y * math.cos( lastPos.angle ) )
+
+        fi_out = loc.angle + lastPos.angle 
+        return Position(x = x_out, y = y_out, angle = fi_out )
 
 
-    def _globalCoordinate(self, x, y, angle, S1, S2):
-        temp = self._localCoordinate(S1,S2)
-        x_out = x + ( temp['x'] * math.cos( math.radians(angle) ) ) - (temp['y'] * math.sin( math.radians(angle) ) )
-        y_out = y + ( temp['x'] * math.sin( math.radians(angle) ) ) + (temp['y'] * math.cos( math.radians(angle) ) )
 
-        fi_out = temp['fi'] + angle 
-        return{'x':x_out, 'y':y_out,'angle': fi_out, 'R':temp['R'], 'S1':S1, 'S2':S2 }
+
+class Position(object):
+    def __init__(self, x= None, y=None, angle = None):
+        self.x = x
+        self.y = y
+        self.angle = angle
