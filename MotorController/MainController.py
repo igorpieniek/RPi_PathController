@@ -18,23 +18,22 @@ class MainController(object):
     #---------------MAIN PROCESS------------------------------------------
     def mainProcess(self):
         pos = self._getPosition()
-        pathPoint = self._getClosestPathPoint(pos)
+        pathPoint, dist = self._getClosestPathPoint(pos)
         if pathPoint == None:
             self._stopMotors()
             return
-        vel = self._mainConversion(pos, pathPoint)
+        vel = self._mainConversion(pos, pathPoint, dist)
         self._setMotorsPWM(vel)
 
     #---------------CONVERTION FUNCTIONS------------------------------------------
     # Konwertuje sciezke na sciezke w lokalnym ukladzie wspolrzednych pierwszego punktu sciezki    
     def _convertPath(self):
-        x_loc = self._rawPath[0][0]
-        y_loc = self._rawPath[0][1]
-        angle = math.radians( self._rawPath[0][2] ) 
+        pLoc = Position(x = self._rawPath[0][0], y = self._rawPath[0][1], angle = math.radians( self._rawPath[0][2] ) )
+
         tempPath = self._rawPath[1:]
         path = []
         for line in tempPath:
-            conv_coord = self._globalToLocalCoordinates(x,loc, y_loc, angle, line[0], line[1], line[2])
+            conv_coord = self._globalToLocalCoordinates(pLoc, Position(x = line[0], y = line[1], angle = line[2] ) )
             path.append(conv_coord)
         return path
 
@@ -42,16 +41,11 @@ class MainController(object):
         #TODO: add method of margin calculation
         self._margin = 0.05
                                     
-    def _mainConversion(self, curentPos, pathPoint):
-
-        temp = pathPoint.copy()
-        temp.pop('dist')
-        if temp == self._path[-1]:
-            pass
+    def _mainConversion(self, curentPos, pathPoint, dist):
 
         # Stanley
-        fi_e = curentPos['angle'] - pathPoint['angle']
-        delta = fi_e + math.atan( self._k_st * pathPoint['dist'] / self._Vx )
+        fi_e = curentPos.angle - pathPoint.angle
+        delta = fi_e + math.atan( self._k_st * dist / self._Vx )
         VR =  (math.cos(delta) + self._k_con * math.sin(delta))
         VL =  (math.cos(delta) - self._k_con * math.sin(delta))
         # Konwersja na procenty
@@ -78,17 +72,15 @@ class MainController(object):
         min_dist = None
         closestPathPoint = None
         for pathPoint in self._path: #poszukiwanie punktu na sciezce ktory jest najblizej
-            dist = self._get2PointsDist( current_pos['x'], current_pos['y'], current_pos['angle'], 
-                                         pathPoint['x'],   pathPoint['y'],   pathPoint['angle'])
+            dist = self._get2PointsDist( current_pos.x, current_pos.y, pathPoint.x,  pathPoint.y)
             if min_dist == None or min_dist > dist : min_dist, closestPathPoint = dist, pathPoint
 
 
         if not min_dist == None and min_dist < self._margin: # zapobieganie blokowaniu się na jednym punkcie sciezki
-            self._path.remove(closestPathPoint) # usuniecie punktu sciezki ktory jets za blisko
+            self._path.remove(closestPathPoint) # usuniecie punktu sciezki ktory jest za blisko
             closestPathPoint = self._getClosestPathPoint(current_pos) # powtorzenie dzialania funkcji
-        else: closestPathPoint.update({'dist': min_dist})
-
-        return closestPathPoint
+        
+        return [closestPathPoint, min_dist]
 
     def _getPosition(self):
         return self._positionControl.getCoordinates()
