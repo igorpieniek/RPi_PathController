@@ -4,7 +4,7 @@ import rospy
 import threading
 from std_msgs.msg import Float32MultiArray
 from MainController import *
-from myserial import *
+from myserial import MotorControler
 
 # ROS names
 nodeName = 'PathController'

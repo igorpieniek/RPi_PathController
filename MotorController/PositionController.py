@@ -49,7 +49,7 @@ class PositionController(object):
         self._lastMeasure[motor] = currentImp
         return S
     #-------------HIGH LEVEL CONVERSION FUNCTIONS---------------------------------------------------------------
-    # na podstawie przesuniecia drogi obu kół określa przemieszczenie względem ostatniego pomiaru
+    # na podstawie przesuniecia drogi obu kol okresla przemieszczenie względem ostatniego pomiaru
     def _localCoordinate(self,SL, SR):
         if SL == SR and SL == 0: return Position(x = 0, y = 0, angle = 0)
         elif SL == SR:
@@ -62,7 +62,7 @@ class PositionController(object):
             fi *= -1
             return Position(x = x, y = y, angle = fi )
 
-    # okresla aktualną pozycje na podstawie poprzedniej pozycji oraz drogi jaka przebyly kola robota
+    # okresla aktualna pozycje na podstawie poprzedniej pozycji oraz drogi jaka przebyly kola robota
     def _globalCoordinate(self, lastPos, SL, SR):
         loc = self._localCoordinate(SL,SR)
         x_out = lastPos.x + ( loc.x * math.cos( lastPos.angle ) ) - (loc.y * math.sin( lastPos.angle ) )

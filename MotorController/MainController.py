@@ -1,5 +1,5 @@
 from PositionController import *
-#from myserial import MotorControler
+
 import math
 
 class MainController(object):
@@ -13,9 +13,9 @@ class MainController(object):
         self._setMargin()
 
         self._k_st = 9 # parametr w poprawce stanleya <1,10>
-        self._k_con = 0.7 # parametr przypoprawce sterowania skrętu <0.5, 1>
-        self._Vx  = 0.05 # wymagana prędkosci pojazdu - przydaje sie przy obliczeniach kąta ale nie przy jego zadawniu
-        self._MAXpercentage = 50 # maksymalne wypełnienie
+        self._k_con = 0.7 # parametr przy poprawce sterowania skretu <0.5, 1>
+        self._Vx  = 0.05 # wymagana predkosci pojazdu - przydaje sie przy obliczeniach keta ale nie przy jego zadawniu
+        self._MAXpercentage = 50 # maksymalne wypelnienie
     #---------------MAIN PROCESS------------------------------------------
     def mainProcess(self):
         pos = self._getPosition()
@@ -79,7 +79,7 @@ class MainController(object):
             if min_dist == None or min_dist > dist : min_dist, closestPathPoint = dist, pathPoint
 
 
-        if not min_dist == None and min_dist < self._margin: # zapobieganie blokowaniu się na jednym punkcie sciezki
+        if not min_dist == None and min_dist < self._margin: # zapobieganie blokowaniu sie na jednym punkcie sciezki
             self._path.remove(closestPathPoint) # usuniecie punktu sciezki ktory jest za blisko
             closestPathPoint = self._getClosestPathPoint(current_pos) # powtorzenie dzialania funkcji
         
