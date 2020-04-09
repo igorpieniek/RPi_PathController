@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>3287eb2a-de9e-4e88-b5f9-d65d748e6669</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>MotorController.py</StartupFile>
+    <StartupFile>test.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -21,13 +21,17 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="test.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="path_controller.py" />
+    <Compile Include="myserial.py" />
     <Compile Include="PositionController.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MainController.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MotorController.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

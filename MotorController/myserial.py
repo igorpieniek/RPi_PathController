@@ -89,7 +89,7 @@ class Parser:
 class MotorControler:
     def __init__(self,serial_name):
         #otwieram polaczenie szeregowe
-        self.serial=serial.Serial(serial_name,115200,timeout=1)
+        self.serial=serial.Serial(serial_name)
         #tworze obiekt parsujacy dane
         self.parser = Parser(self.serial)
         #tworze wzorzec ramki danych

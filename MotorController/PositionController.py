@@ -72,7 +72,7 @@ class PositionController(object):
         return Position(x = x_out, y = y_out, angle = fi_out )
 
     def _updateMeasurments(self):
-        self._rawData = self._motor_motorControler.WaitOnMeasurement(1)
+        self._rawData = self._motorControler.WaitOnMeasurement(1)
         self._impulsesL = np.uint16(self._rawData[3])
         self._impulsesR = np.uint16(self._rawData[4])
 
