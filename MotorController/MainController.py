@@ -76,11 +76,12 @@ class MainController(object):
         # Konwersja na procenty
         VR = self.__percentageConversion(VR)
         VL = self.__percentageConversion(VL)
+        print('VR = '+ str(VR)+ ' VL = '+ str(VL))
         return {'R': VR, 'L': VL}
 
     def __percentageConversion(self, V):
         max_value = (math.cos(math.radians(45)) + self.__k_con * math.sin(math.radians(45)))
-        if abs(V) <= max_value: return round( (V * self.__MAXpercentage) / max_value , 0)
+        if abs(V) <= max_value: return int( (V * self.__MAXpercentage) / max_value )
         elif V < 0 :  return -self.__MAXpercentage
         else:        return self.__MAXpercentage
 

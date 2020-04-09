@@ -22,7 +22,7 @@ if False:
     controller = MainController(com) 
 
     def callback(msg):
-        rospy.loginfo('New msg received')
+        rospy.loginfo('New msg received: '+ msg.header.frame_id)
         status  = controller.addPathPoint(msg.vector, msg.header.frame_id)	
         while status:
             output = controller.mainProcess()
@@ -33,7 +33,7 @@ if False:
 
     def listener():
         rospy.init_node(nodeName, anonymous = True)
-        rospy.Subscriber(subName, Float32MultiArray , callback)
+        rospy.Subscriber(subName, Vector3Stamped , callback)
         rospy.spin()
 
     if __name__ == '__main__':
