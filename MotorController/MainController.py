@@ -71,8 +71,13 @@ class MainController(object):
         # Stanley
         fi_e = curentPos.angle - pathPoint.angle
         delta = fi_e + math.atan( self.__k_st * dist / self.__Vx )
-        VR =  (math.cos(delta) + self.__k_con * math.sin(delta))
-        VL =  (math.cos(delta) - self.__k_con * math.sin(delta))
+        if delta >= math.radians(90) or delta <= math.radians(-90):
+            VR =  (math.cos(delta) + self.__k_con * math.sin(delta)) #test!!
+            VL =  (-math.cos(delta) - self.__k_con * math.sin(delta))
+        else:
+            VR =  (math.cos(delta) + self.__k_con * math.sin(delta))
+            VL =  (math.cos(delta) - self.__k_con * math.sin(delta))
+
         # Konwersja na procenty
         VR = self.__percentageConversion(VR)
         VL = self.__percentageConversion(VL)
@@ -102,7 +107,7 @@ class MainController(object):
 
         if not min_dist == None and min_dist < self.__margin: # zapobieganie blokowaniu sie na jednym punkcie sciezki
             self.__path.remove(closestPathPoint) # usuniecie punktu sciezki ktory jest za blisko
-            closestPathPoint = self.__getClosestPathPoint(current_pos) # powtorzenie dzialania funkcji
+            closestPathPoint, min_dist = self.__getClosestPathPoint(current_pos) # powtorzenie dzialania funkcji
         
         return [closestPathPoint, min_dist]
 
