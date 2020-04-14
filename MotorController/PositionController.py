@@ -54,10 +54,10 @@ class PositionController(object):
         elif SL == SR:
             return Position(x = 0, y = SL, angle = 0)
         else:
-            fi = ( SL - SR ) / self.__wheelbase
+            fi = ( SL - SR ) / self.__wheelbase #w radianach 
             R = ( (SL * self.__wheelbase) /  (SL - SR) ) - (0.5* self.__wheelbase)
             y = R * math.sin( fi )
-            x =  y/ math.tan( 0.5*( math.pi-fi) )
+            x =  R * (1 - math.cos( fi ))
             fi *= -1
             return Position(x = x, y = y, angle = fi )
 
