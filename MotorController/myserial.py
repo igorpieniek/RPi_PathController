@@ -44,7 +44,7 @@ class Parser:
             else:
                 if byte == 0xAA:
                     ret = self.data[0]
-                    print('crc poprawne')
+                    #print('crc poprawne')
                 self.state=0
         else:
             self.state=0

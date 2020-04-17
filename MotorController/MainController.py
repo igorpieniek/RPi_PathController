@@ -14,8 +14,8 @@ class MainController(object):
 
         self.__k_st = 9 # parametr w poprawce stanleya <1,10>
         self.__k_con = 0.7 # parametr przy poprawce sterowania skretu <0.5, 1>
-        self.__Vx  = 0.05 # wymagana predkosci pojazdu - przydaje sie przy obliczeniach keta ale nie przy jego zadawniu
-        self.__MAXpercentage = 50 # maksymalne wypelnienie
+        self.__Vx  = 0.05 # wymagana predkosci pojazdu - przydaje sie przy obliczeniach kata ale nie przy jego zadawniu
+        self.__MAXpercentage = 100 # maksymalne wypelnienie
     #---------------MAIN PROCESS------------------------------------------
     def mainProcess(self):
         pos = self.__getPosition()

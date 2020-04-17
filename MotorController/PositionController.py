@@ -33,7 +33,7 @@ class PositionController(object):
     def __getDiff(self, current, last):
         diff = current - last
         if self.__getSign(diff) +1 : #przyrost dodatni
-            numOfImpulses = self.__getSign(diff) * int(diff)  # realna wartość zwrocona wraz ze znakiem w zaleznosci od kierunku jazdy
+            numOfImpulses = self.__getSign(diff) * int(diff)  # realna wartosc zwrocona wraz ze znakiem w zaleznosci od kierunku jazdy
         else: #przyrost ujemny
             numOfImpulses = self.__getSign(diff) * int(1 + self.__maxValType - diff)
         return numOfImpulses
@@ -48,7 +48,7 @@ class PositionController(object):
         self.__lastMeasure[motor] = currentImp
         return S
     #-------------HIGH LEVEL CONVERSION FUNCTIONS---------------------------------------------------------------
-    # na podstawie przesuniecia drogi obu kol okresla przemieszczenie względem ostatniego pomiaru
+    # na podstawie przesuniecia drogi obu kol okresla przemieszczenie wzgledem ostatniego pomiaru
     def __localCoordinate(self,SL, SR):
         if SL == SR and SL == 0: return Position(x = 0, y = 0, angle = 0)
         elif SL == SR:
