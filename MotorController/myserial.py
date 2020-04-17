@@ -30,13 +30,13 @@ class Parser:
                 self.state=2
             else:
                 self.state=0
-                #print('error')
+                print('error')
         elif self.state == 2:
             self.size = byte
             self.ptr = 0
             self.state=3
             self.data.clear()
-            #print('Rozmiar: ',self.size)
+            print('Rozmiar: ',self.size)
         elif self.state == 3:
             if self.ptr<self.size:
                 self.data.append(byte)
@@ -44,7 +44,7 @@ class Parser:
             else:
                 if byte == 0xAA:
                     ret = self.data[0]
-                    #print('crc poprawne')
+                    print('crc poprawne')
                 self.state=0
         else:
             self.state=0
@@ -60,13 +60,13 @@ class Parser:
                 self.enc_a=frame.enc_a
                 self.enc_b=frame.enc_b
                 r = self.data[0]
-                #print(frame)
+                print(frame)
         return r
     def receiver_thread(self,dd):
         print('thred start')
         while self.thread_run>0:
             pre = self.serial.read(17)
-            #print(pre)
+            print(pre)
             if len(pre)>0:
                 ret=self.addByteArray(pre);
                 if ret>0:
@@ -89,7 +89,7 @@ class Parser:
 class MotorControler:
     def __init__(self,serial_name):
         #otwieram polaczenie szeregowe
-        self.serial=serial.Serial(serial_name)
+        self.serial=serial.Serial(port = serial_name, baudrate=115200, bytesize=8, parity='N')
         #tworze obiekt parsujacy dane
         self.parser = Parser(self.serial)
         #tworze wzorzec ramki danych
