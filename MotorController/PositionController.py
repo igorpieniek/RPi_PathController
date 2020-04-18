@@ -45,7 +45,7 @@ class PositionController(object):
 
     def __encoderConversion(self, motor):
         currentImp = self.__getCurrentImpulses(motor)
-        S = ( self.__getDiff(currentImp, self.__lastMeasure[motor]) / self.__impulsesPerRevolution) * math.pi* self.__wheelDiameter
+        S = ( self.__getDiff(currentImp, self.__lastMeasure[motor]) / self.__impulsesPerRevolution) * math.pi* self.__wheelDiameter # imp /imp na obrot *pi* D
         self.__lastMeasure[motor] = currentImp
         return S
     #-------------HIGH LEVEL CONVERSION FUNCTIONS---------------------------------------------------------------
@@ -59,14 +59,14 @@ class PositionController(object):
             R = ( (SL * self.__wheelbase) /  (SL - SR) ) - (0.5* self.__wheelbase)
             y = R * math.sin( fi )
             x =  R * (1 - math.cos( fi ))
-            fi *= -1
+            fi *= -1 
             return Position(x = x, y = y, angle = fi )
 
     # okresla aktualna pozycje na podstawie poprzedniej pozycji oraz drogi jaka przebyly kola robota
     def __globalCoordinate(self, lastPos, SL, SR):
         loc = self.__localCoordinate(SL,SR)
-        x_out = lastPos.x + ( loc.x * math.cos( lastPos.angle ) ) - (loc.y * math.sin( lastPos.angle ) )
-        y_out = lastPos.y + ( loc.x * math.sin( lastPos.angle ) ) + (loc.y * math.cos( lastPos.angle ) )
+        x_out = lastPos.x + ( loc.x * math.cos( lastPos.angle - math.radians(90)) ) - (loc.y * math.sin( lastPos.angle - math.radians(90)) )
+        y_out = lastPos.y + ( loc.x * math.sin( lastPos.angle - math.radians(90)) ) + (loc.y * math.cos( lastPos.angle - math.radians(90)) )
 
         fi_out = loc.angle + lastPos.angle 
         return Position(x = x_out, y = y_out, angle = fi_out )
@@ -87,4 +87,4 @@ class Position(object):
         self.angle = angle
 
     def __str__(self):
-       return 'Pos( '+ str(self.x)+', ' + str(self.y)+ ', ' + str(self.angle)+ ' )'
+       return 'Pos( '+ str(round(self.x, 4))+', ' + str(round(self.y,4))+ ', ' + str(round(math.degrees(self.angle),2))+ ' )'

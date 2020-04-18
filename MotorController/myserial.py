@@ -66,7 +66,7 @@ class Parser:
         print('thred start')
         while self.thread_run>0:
             pre = self.serial.read(17)
-            print(pre)
+            #print(pre)
             if len(pre)>0:
                 ret=self.addByteArray(pre);
                 if ret>0:
@@ -113,7 +113,7 @@ class MotorControler:
             right_duty = -100
         frame = self.frame_pwm.build(dict(pwm_a=left_duty,pwm_b=right_duty))
         self.serial.write(frame);
-        print("Wyslano dane: ",frame)
+       # print("Wyslano dane: ",frame)
     def GetMeasurements(self):
         return self.parser.get_data()
     def WaitOnMeasurement(self,timeout):

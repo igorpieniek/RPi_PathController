@@ -2,6 +2,7 @@ from myserial import *
 from MainController import *
 import math
 import numpy as np
+import time
 
 com = MotorControler('COM3')
 main = MainController(com)
@@ -18,22 +19,19 @@ def addAngle(array):
 
 path = np.array([[0,0,],
                  [0,1],
-                 [1,3],
-                 [2,4],
-                 [3,5],
-                 [4,6],
-                 [5,7],
-                 [6,7],
-                 [7,7],
-                 [8,7],
-                 [9,7],
-                 [10,7],
-                 [11,6],
-                 [11,5],
-                 [12,4],
+                 [0,2],
+                 [0,3],
+                 [-1,3],
+                 [-2,3],
+                 [-3,3],
+                 [-4,3],
+                 [-4,2],
+                 [-4,1],
+                 [-4,0],
+                 [-4,-1],
                  ])
 
-path = [[a[0]*0.05, a[1]*0.05] for a in path] # ustalona wielkośc 'kratek' na 5 cm
+path = [[a[0]*0.4, a[1]*0.4] for a in path] # ustalona wielkośc 'kratek' na 5 cm
 path = addAngle(path)
 
 
@@ -48,4 +46,5 @@ status = main.addPathPoint(Position(path[-1][0],path[-1][1],path[-1][2]),'PATH_E
 
 while status:
     output = main.mainProcess()
+    time.sleep(0.04)
     if not output['status']: break
