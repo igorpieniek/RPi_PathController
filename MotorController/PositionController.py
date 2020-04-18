@@ -14,7 +14,8 @@ class PositionController(object):
         self.__maxValType = np.iinfo(np.uint16()).max
         self.__halfUint16 =  self.__maxValType//2 #polowa zakresu liczby 2bajtowej uint16
 
-        self.__lastMeasure = {'L' : np.uint16(0), 'R' : np.uint16(0)}
+        self.__updateMeasurments()
+        self.__lastMeasure = {'L' : self.__impulsesL, 'R' : self.__impulsesR}
 
 
     #-------------MAIN PROCESS FUNCTIONS-----------------------------------------------------------------------
