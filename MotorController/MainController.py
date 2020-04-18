@@ -16,12 +16,13 @@ class MainController(object):
         self.__k_con = 0.7 # parametr przy poprawce sterowania skretu <0.5, 1>
         self.__Vx  = 0.05 # wymagana predkosci pojazdu - przydaje sie przy obliczeniach kata ale nie przy jego zadawniu
         self.__MAXpercentage = 100 # maksymalne wypelnienie
+        self.__MINpercentage = 40
     #---------------MAIN PROCESS------------------------------------------
     def mainProcess(self):
         pos = self.__getPosition()
         pathPoint, dist = self.__getClosestPathPoint(pos)
         if pathPoint == None:
-            self._stopMotors()
+            self.__stopMotors()
             return {'status': False }
         vel = self.__mainConversion(pos, pathPoint, dist)
         self.__setMotorsPWM(vel)
@@ -52,15 +53,16 @@ class MainController(object):
         self.__rawPath = []
 
     def __convertPath(self):
-        pLoc = Position(x = self.__rawPath[0][0], y = self.__rawPath[0][1], angle =  self.__rawPath[0][2] )
-        print('PATH CONVERSION START')
-        tempPath = self.__rawPath[1:]
-        path = []
-        for line in tempPath:
-            conv_coord = self.__globalToLocalCoordinates(pLoc, Position(x = line[0], y = line[1], angle = line[2] ) )
-            print('X: '+str(conv_coord.x)+' Y: '+str(conv_coord.y)+ ' angle: ' + str(conv_coord.angle) )
-            path.append(conv_coord)
-        self.__path = path
+        if self.__rawPath:
+            pLoc = Position(x = self.__rawPath[0][0], y = self.__rawPath[0][1], angle =  self.__rawPath[0][2] )
+            print('PATH CONVERSION START')
+            tempPath = self.__rawPath[1:]
+            path = []
+            for line in tempPath:
+                conv_coord = self.__globalToLocalCoordinates(pLoc, Position(x = line[0], y = line[1], angle = line[2] ) )
+                print('X: '+str(conv_coord.x)+' Y: '+str(conv_coord.y)+ ' angle: ' + str(conv_coord.angle) )
+                path.append(conv_coord)
+            self.__path = path
 
     def __setMargin(self):
         #TODO: add method of margin calculation
@@ -71,12 +73,8 @@ class MainController(object):
         # Stanley
         fi_e = curentPos.angle - pathPoint.angle
         delta = fi_e + math.atan( self.__k_st * dist / self.__Vx )
-        if delta >= math.radians(90) or delta <= math.radians(-90):
-            VR =  (math.cos(delta) + self.__k_con * math.sin(delta)) #test!!
-            VL =  (-math.cos(delta) - self.__k_con * math.sin(delta))
-        else:
-            VR =  (math.cos(delta) + self.__k_con * math.sin(delta))
-            VL =  (math.cos(delta) - self.__k_con * math.sin(delta))
+        VR =  (math.cos(delta) + self.__k_con * math.sin(delta))
+        VL =  (math.cos(delta) - self.__k_con * math.sin(delta))
 
         # Konwersja na procenty
         VR = self.__percentageConversion(VR)
@@ -86,7 +84,8 @@ class MainController(object):
 
     def __percentageConversion(self, V):
         max_value = (math.cos(math.radians(45)) + self.__k_con * math.sin(math.radians(45)))
-        if abs(V) <= max_value: return int( (V * self.__MAXpercentage) / max_value )
+        if V <= max_value and V >=0: return int( (((V * self.__MAXpercentage) / max_value)/2) +  self.__MINpercentage )
+        elif  V >= max_value and V <=0: return int( (((V * self.__MAXpercentage) / max_value)/2) -  self.__MINpercentage )
         elif V < 0 :  return -self.__MAXpercentage
         else:        return self.__MAXpercentage
 

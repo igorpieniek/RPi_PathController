@@ -36,7 +36,7 @@ class Parser:
             self.ptr = 0
             self.state=3
             self.data.clear()
-            print('Rozmiar: ',self.size)
+           # print('Rozmiar: ',self.size)
         elif self.state == 3:
             if self.ptr<self.size:
                 self.data.append(byte)
@@ -60,7 +60,7 @@ class Parser:
                 self.enc_a=frame.enc_a
                 self.enc_b=frame.enc_b
                 r = self.data[0]
-                print(frame)
+                #print(frame)
         return r
     def receiver_thread(self,dd):
         print('thred start')
