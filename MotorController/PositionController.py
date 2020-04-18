@@ -73,6 +73,7 @@ class PositionController(object):
 
     def __updateMeasurments(self):
         self.__rawData = self.__motorControler.WaitOnMeasurement(1)
+        if not self.__rawData[0]: raise NameError('ODBIOR DANYCH NIE DZIALA')
         self.__impulsesL = np.uint16(self.__rawData[3])
         self.__impulsesR = np.uint16(self.__rawData[4])
 
