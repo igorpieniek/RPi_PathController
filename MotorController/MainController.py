@@ -1,5 +1,7 @@
 from PositionController import *
-
+import matplotlib.pyplot as plt
+import matplotlib
+import numpy as np
 import math
 
 class MainController(object):
@@ -15,11 +17,23 @@ class MainController(object):
         self.__k_st = 9 # parametr w poprawce stanleya <1,10>
         self.__k_con = 0.7 # parametr przy poprawce sterowania skretu <0.5, 1>
         self.__Vx  = 0.05 # wymagana predkosci pojazdu - przydaje sie przy obliczeniach kata ale nie przy jego zadawniu
-        self.__MAXpercentage = 100 # maksymalne wypelnienie
-        self.__MINpercentage = 40
+        self.__MAXpercentage = 70 # maksymalne wypelnienie
+        self.__MINpercentage = 50
+        self.plotInit()
+
+    def plotInit(self):
+        self.pl, = plt.plot([], [])
+
+    def plotUpdate(self, x,y):
+        self.pl.set_xdata(np.append(self.pl.get_xdata(), x ))
+        self.pl.set_ydata(np.append(self.pl.get_ydata(), y ))
+        plt.draw()
+
+
     #---------------MAIN PROCESS------------------------------------------
     def mainProcess(self):
         pos = self.__getPosition()
+        print(pos)
         pathPoint, dist = self.__getClosestPathPoint(pos)
         if pathPoint == None:
             self.__stopMotors()
@@ -40,7 +54,7 @@ class MainController(object):
             self.__rawPath.append([point.x, point.y, point.angle])
         elif id == 'PATH_END':
             print('PATH_END')
-            for line in self.__rawPath: print(str(line))
+            for line in self.__rawPath: print(str(line[0]), str(line[1]), str(math.degrees(line[2] ) ) )
             self.__convertPath()
             return True
         else: raise NameError('NO SUCH ID NAME AS: '+ id)
@@ -60,7 +74,7 @@ class MainController(object):
             path = []
             for line in tempPath:
                 conv_coord = self.__globalToLocalCoordinates(pLoc, Position(x = line[0], y = line[1], angle = line[2] ) )
-                print('X: '+str(conv_coord.x)+' Y: '+str(conv_coord.y)+ ' angle: ' + str(conv_coord.angle) )
+                print('X: '+str(conv_coord.x)+' Y: '+str(conv_coord.y)+ ' angle: ' + str(math.degrees(conv_coord.angle)) )
                 path.append(conv_coord)
             self.__path = path
 
@@ -117,9 +131,9 @@ class MainController(object):
         return math.sqrt((x2 - x1)**2 + (y2 - y1)**2)  
     
     def __globalToLocalCoordinates(self, pointRef, point  ):
-        x_out =  (point.x - pointRef.x ) * math.cos( pointRef.angle ) + (point.y - pointRef.y) * math.sin( pointRef.angle ) 
-        y_out = -(point.x - pointRef.x ) * math.sin( pointRef.angle ) + (point.y - pointRef.y) * math.cos( pointRef.angle ) 
-        angle_out = point.angle - pointRef.angle
+        x_out =  (point.x - pointRef.x ) * math.cos( pointRef.angle - math.radians(90) ) + (point.y - pointRef.y) * math.sin( pointRef.angle - math.radians(90)) 
+        y_out = -(point.x - pointRef.x ) * math.sin( pointRef.angle - math.radians(90) ) + (point.y - pointRef.y) * math.cos( pointRef.angle - math.radians(90) ) 
+        angle_out = point.angle - pointRef.angle  + math.radians(90)
         return Position(x = x_out, y = y_out, angle = angle_out )
 
    

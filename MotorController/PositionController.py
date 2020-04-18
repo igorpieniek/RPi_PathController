@@ -5,7 +5,7 @@ import numpy as np
 class PositionController(object):
     def __init__(self, motorControler ):
         self.__motorControler = motorControler
-        self.__lastLocation = Position(x = 0, y = 0, angle = 0)
+        self.__lastLocation = Position(x = 0, y = 0, angle = math.pi/2)
 
         self.__timeout = 1 # timeout do wiadomosci
         self.__wheelbase = 0.2127 #rozstaw kol w [m]
@@ -72,10 +72,10 @@ class PositionController(object):
         return Position(x = x_out, y = y_out, angle = fi_out )
 
     def __updateMeasurments(self):
-        self.__rawData = self.__motorControler.WaitOnMeasurement(1)
+        self.__rawData = self.__motorControler.WaitOnMeasurement(5)
         if not self.__rawData[0]: raise NameError('ODBIOR DANYCH NIE DZIALA')
-        self.__impulsesL = np.uint16(self.__rawData[3])
-        self.__impulsesR = np.uint16(self.__rawData[4])
+        self.__impulsesR = np.uint16(self.__rawData[3])
+        self.__impulsesL = np.uint16(self.__rawData[4])
 
 
 
@@ -85,3 +85,6 @@ class Position(object):
         self.x = x
         self.y = y
         self.angle = angle
+
+    def __str__(self):
+       return 'Pos( '+ str(self.x)+', ' + str(self.y)+ ', ' + str(self.angle)+ ' )'
