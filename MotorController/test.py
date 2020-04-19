@@ -13,7 +13,11 @@ def addAngle(array):
         if index == len(array)-1: break
         if array[index+1][0] - point[0] == 0 and array[index+1][1] - point[1] > 0 : angle = math.pi/2
         elif array[index+1][0] - point[0] == 0 and array[index+1][1] - point[1] < 0 : angle = -math.pi/2
-        else: angle = math.atan( (array[index+1][1] - point[1]) / ( array[index+1][0] - point[0] ) )
+        else: 
+            angle = math.atan( (array[index+1][1] - point[1]) / ( array[index+1][0] - point[0] ) )
+            if ( array[index+1][0] - point[0] ) < 0 : angle += math.pi 
+       
+
         outarray.append([point[0], point[1], angle])
     return outarray
 
@@ -47,4 +51,6 @@ status = main.addPathPoint(Position(path[-1][0],path[-1][1],path[-1][2]),'PATH_E
 while status:
     output = main.mainProcess()
     time.sleep(0.04)
-    if not output['status']: break
+    if not output['status']: 
+        print('KONIEC SCIEZKI KONIEC TESTU')
+        break

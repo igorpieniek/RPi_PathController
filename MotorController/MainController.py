@@ -18,6 +18,7 @@ class MainController(object):
         self.__Vx  = 0.05 # wymagana predkosci pojazdu - przydaje sie przy obliczeniach kata ale nie przy jego zadawniu
         self.__MAXpercentage = 85 # maksymalne wypelnienie
         self.__MINpercentage = 45
+        self.__motorOffset = {'L':-5, 'R':5}
         self.plotInit()
 
     def plotInit(self):
@@ -32,9 +33,9 @@ class MainController(object):
     def mainProcess(self):
         pos = self.__getPosition()
         print(pos)
-        self.plotUpdate( pos.x,  pos.y, 'red')
+        self.plotUpdate( pos.x,  pos.y, 'red') # update plot
         pathPoint, dist = self.__getClosestPathPoint(pos)
-        if pathPoint == None:
+        if not pathPoint :
             self.__stopMotors()
             return {'status': False }
         self.plotUpdate( pathPoint.x,  pathPoint.y, 'blue')
@@ -83,26 +84,26 @@ class MainController(object):
 
     def __setMargin(self):
         #TODO: add method of margin calculation
-        self.__margin = 0.01
+        self.__margin = 0.02
                                     
     def __mainConversion(self, curentPos, pathPoint, dist):
 
         # Stanley
         fi_e = -(curentPos.angle - pathPoint.angle)
-        delta = fi_e + math.atan( (self.__k_st * dist) / self.__Vx ) #na ten moment wylaczona ze wzgledu na dziwne wyniki
-        VR =  (math.cos(delta) + self.__k_con * math.sin(delta))
-        VL =  (math.cos(delta) - self.__k_con * math.sin(delta))
+        #delta = fi_e + math.atan( (self.__k_st * dist) / self.__Vx ) #na ten moment wylaczona ze wzgledu na dziwne wyniki
+        VR =  (math.cos(fi_e) + self.__k_con * math.sin(fi_e))
+        VL =  (math.cos(fi_e) - self.__k_con * math.sin(fi_e))
 
         # Konwersja na procenty
-        VR = -self.__percentageConversion(VR)
-        VL = -self.__percentageConversion(VL)
-        print('VR = '+ str(VR)+ ' VL = '+ str(VL))
+        VR = -self.__percentageConversion(VR, 'R')
+        VL = -self.__percentageConversion(VL, 'L')
+        print('Kontroler out: ',' VR = '+ str(-VR)+ ' VL = '+ str(-VL),' fie= '+ str(math.degrees(fi_e)),)# ' delta= '+ str(math.degrees(delta)) )
         return {'R': VR, 'L': VL}
 
-    def __percentageConversion(self, V):
+    def __percentageConversion(self, V, motor):
         max_value = (math.cos(math.radians(45)) + self.__k_con * math.sin(math.radians(45)))
-        if V <= max_value and V >=0: return int( (((V * self.__MAXpercentage) / max_value)/2) +  self.__MINpercentage )
-        elif  V >= -max_value and V <=0: return int( (((V * self.__MAXpercentage) / max_value)/2) -  self.__MINpercentage )
+        if V <= max_value and V >=0: return int( (((V * self.__MAXpercentage) / max_value)/2) +  self.__MINpercentage ) + self.__motorOffset[motor]
+        elif  V >= -max_value and V <=0: return int( (((V * self.__MAXpercentage) / max_value)/2) -  self.__MINpercentage ) - self.__motorOffset[motor]
         elif V < 0 :  return -self.__MAXpercentage
         else:        return self.__MAXpercentage
 
@@ -116,11 +117,12 @@ class MainController(object):
     def __getClosestPathPoint(self,current_pos):
         min_dist = None
         closestPathPoint = None
+        if not self.__path: return [[], None]
         for pathPoint in self.__path: #poszukiwanie punktu na sciezce ktory jest najblizej
             dist = self.__get2PointsDist( current_pos.x, current_pos.y, pathPoint.x,  pathPoint.y)
             if min_dist == None or min_dist > dist : min_dist, closestPathPoint = dist, pathPoint
 
-
+        if closestPathPoint == self.__path[-1]: return [[], None]
         if not min_dist == None and min_dist <= self.__margin: # zapobieganie blokowaniu sie na jednym punkcie sciezki
             self.__path.remove(closestPathPoint) # usuniecie punktu sciezki ktory jest za blisko
             closestPathPoint, min_dist = self.__getClosestPathPoint(current_pos) # powtorzenie dzialania funkcji
