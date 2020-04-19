@@ -22,9 +22,10 @@ class MainController(object):
         self.plotInit()
 
     def plotInit(self):
-        plt.axis([-2, 2, -2, 2])
+        plt.axis([-3, 1, -1, 3])
 
     def plotUpdate(self, x,y, color):
+
         plt.scatter(x,y, c= color)
         plt.pause(0.01)
 
@@ -84,7 +85,7 @@ class MainController(object):
 
     def __setMargin(self):
         #TODO: add method of margin calculation
-        self.__margin = 0.02
+        self.__margin = 0.01
                                     
     def __mainConversion(self, curentPos, pathPoint, dist):
 

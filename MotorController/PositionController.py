@@ -10,7 +10,7 @@ class PositionController(object):
         self.__timeout = 1 # timeout do wiadomosci
         self.__wheelbase = 0.2127 #rozstaw kol w [m]
         self.__wheelDiameter = 0.0898 # srednica kola [m]
-        self.__impulsesPerRevolution= 3600 # ilosc impulsow enkodera na obrot(przelozenie * ilosc impulsow na obrot walu silnika)
+        self.__impulsesPerRevolution= 1800 # ilosc impulsow enkodera na obrot(przelozenie * ilosc impulsow na obrot walu silnika)
         self.__maxValType = np.iinfo(np.uint16()).max
         self.__halfUint16 =  self.__maxValType//2 #polowa zakresu liczby 2bajtowej uint16
 

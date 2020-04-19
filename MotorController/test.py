@@ -20,29 +20,58 @@ def addAngle(array):
 
         outarray.append([point[0], point[1], angle])
     return outarray
-
+#path = np.array([[0,0,],
+#                 [1,0.5,],
+#                 [1,1.5,],
+#                 [0,2,],
+#                 [-1,2,],
+#                 [-1,3,],
+#                 [-1,4,],
+#                 [-1,5,],
+#                 [-1,6,],
+#                 [-1.5,6.5,],
+#                 [-2,7,],
+#                 [-2.5,6.5,],
+#                 [-3,6,],
+#                 [-3,5,],
+#                 [-3,4,],
+#                 [-3,3,],
+#                 [-3,2,],
+#                 [-4,2,],
+#                 [-5,1.5,],
+#                 [-5,0.5,],
+#                 [-4,0,],
+#                         ])
 path = np.array([[0,0,],
-                 [0,1],
-                 [0,2],
-                 [0,3],
-                 [-1,3],
-                 [-2,3],
-                 [-3,3],
-                 [-4,3],
-                 [-4,2],
-                 [-4,1],
-                 [-4,0],
-                 [-4,-1],
+                 [-1,0,],
+                 [-2,0,],
+                 [-3,0,],
+                 [-4,0,],
+                 [-4,1,],
+                 [-4,2,],
+                 [-4,3,],
+                 [-4,4,],
+                 [-3,4,],
+                 [-2,3.5,],
+                 [-1,3,],
+                 [0,3,],
+                 [0,4,],
+                 [0,5,],
+                 [-0.5,5,],
+                 [-1.5,5.5,],
+                 [-2,6,],
+                 [-3,6,],
+                 [-4,6,],
                  ])
 
-path = [[a[0]*0.4, a[1]*0.4] for a in path] # ustalona wielkośc 'kratek' na 5 cm
+path = [[a[0]*0.3, a[1]*0.3] for a in path] # ustalona wielkośc 'kratek' na 5 cm
 path = addAngle(path)
 
 
 firstIT = True
 for pa in path:
     if firstIT:
-        main.addPathPoint(Position(pa[0], pa[1], pa[2]),'POSITION')
+        main.addPathPoint(Position(pa[0], pa[1], math.radians(90)),'POSITION')
         firstIT = False
     else: main.addPathPoint(Position(pa[0], pa[1], pa[2] ),'PATH') 
 
@@ -54,3 +83,5 @@ while status:
     if not output['status']: 
         print('KONIEC SCIEZKI KONIEC TESTU')
         break
+
+del com
