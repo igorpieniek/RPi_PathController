@@ -1,5 +1,5 @@
 import math
-#import numpy as np
+import numpy as np
 
 
 class PositionController(object):
@@ -73,7 +73,7 @@ class PositionController(object):
 
     def __updateMeasurments(self):
         self.__rawData = self.__motorControler.WaitOnMeasurement(5)
-        if not self.__rawData[0]: raise NameError('ODBIOR DANYCH NIE DZIALA')
+        if self.__rawData[0]== False: raise NameError('ODBIOR DANYCH NIE DZIALA') # status could be NONE
         self.__impulsesR = np.uint16(self.__rawData[3])
         self.__impulsesL = np.uint16(self.__rawData[4])
 

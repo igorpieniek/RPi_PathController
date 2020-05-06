@@ -67,18 +67,14 @@ class Parser:
         print('thred start')
         import binascii
         while self.thread_run>0:
-            #pre = self.serial.read(17)
+            #pre = self.serial.read(17) 
             pre =  bytearray(self.serial.read(17))
-            #raw = [str(self.serial.read(1).encode('hex')) for a in range(17)]
-            #pre = [binascii.unhexlify(el)  for el in raw]
-            #pre = [int( struct.unpack('<b',  binascii.unhexlify(el))[0] ) for el in raw]
-            #print(pre)
             if len(pre)>0:
                 ret=self.addByteArray(pre);
                 if ret>0:
                     with self.notifier:
                         self.notifier.notify()
-                    print(self.rpm_a,self.rpm_b,self.enc_a,self.enc_b)
+                    #print(self.rpm_a,self.rpm_b,self.enc_a,self.enc_b)
         print('thread stop')
     def stop_receiver(self):
         self.thread_run=0
