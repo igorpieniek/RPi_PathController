@@ -11,7 +11,7 @@
     <OutputPath>.</OutputPath>
     <Name>MotorController</Name>
     <RootNamespace>MotorController</RootNamespace>
-    <InterpreterId>Global|PythonCore|3.7</InterpreterId>
+    <InterpreterId>Global|PythonCore|2.7</InterpreterId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -35,6 +35,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <InterpreterReference Include="Global|PythonCore|2.7" />
     <InterpreterReference Include="Global|PythonCore|3.7" />
     <InterpreterReference Include="Global|PythonCore|3.8" />
   </ItemGroup>

@@ -1,5 +1,6 @@
 import serial
 from construct import*
+import struct
 import threading
 import time
 
@@ -8,7 +9,7 @@ class Parser:
         self.size=0
         self.state=0
         self.ptr=0
-        self.data=bytearray(0)
+        self.data= bytearray(0)
         self.rpm_a=0
         self.rpm_b=0
         self.enc_a=0
@@ -35,14 +36,14 @@ class Parser:
             self.size = byte
             self.ptr = 0
             self.state=3
-            self.data.clear()
+            self.data = bytearray(0) # change from clear()
            # print('Rozmiar: ',self.size)
         elif self.state == 3:
             if self.ptr<self.size:
                 self.data.append(byte)
                 self.ptr+=1;
             else:
-                if byte == 0xAA:
+                if byte == 0xAA or byte == -86:
                     ret = self.data[0]
                     #print('crc poprawne')
                 self.state=0
@@ -64,8 +65,13 @@ class Parser:
         return r
     def receiver_thread(self,dd):
         print('thred start')
+        import binascii
         while self.thread_run>0:
-            pre = self.serial.read(17)
+            #pre = self.serial.read(17)
+            pre =  bytearray(self.serial.read(17))
+            #raw = [str(self.serial.read(1).encode('hex')) for a in range(17)]
+            #pre = [binascii.unhexlify(el)  for el in raw]
+            #pre = [int( struct.unpack('<b',  binascii.unhexlify(el))[0] ) for el in raw]
             #print(pre)
             if len(pre)>0:
                 ret=self.addByteArray(pre);
@@ -90,6 +96,7 @@ class MotorControler:
     def __init__(self,serial_name):
         #otwieram polaczenie szeregowe
         self.serial=serial.Serial(port = serial_name, baudrate=115200, bytesize=8, parity='N')
+        print(self.serial)
         #tworze obiekt parsujacy dane
         self.parser = Parser(self.serial)
         #tworze wzorzec ramki danych
@@ -113,7 +120,7 @@ class MotorControler:
             right_duty = -100
         frame = self.frame_pwm.build(dict(pwm_a=left_duty,pwm_b=right_duty))
         self.serial.write(frame);
-       # print("Wyslano dane: ",frame)
+        print("Wyslano dane: ",frame)
     def GetMeasurements(self):
         return self.parser.get_data()
     def WaitOnMeasurement(self,timeout):
@@ -121,5 +128,5 @@ class MotorControler:
         # funkcja zwraca w pierwszym argumencie info o odczycie nowych danych w zadanym czasie: False - przekroczono timeout.
         return self.parser.wait_on_data(timeout)
 
-
-
+    
+    
