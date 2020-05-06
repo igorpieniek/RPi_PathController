@@ -4,12 +4,7 @@ import math
 import numpy as np
 import time
 
-#com = MotorControler('COM6')
-#i=0
-#while i <10:
-#    print(com.WaitOnMeasurement(1))
-#    time.sleep(0.1)
-#    i+=1
+
 com = MotorControler('COM6')
 main = MainController(com)
 

@@ -14,7 +14,7 @@ subName = "/matlab_velocity"
 # COM
 for i in range(4):
         try:
-                com = MotorControler('/dev/ttyACM'+ str(i))
+                com = MotorControler('/dev/ttyUSB'+ str(i))
         except:
                 print('problem z ustawieniem portu nr'+ str(i))
         else: break

@@ -1,5 +1,4 @@
 from PositionController import *
-#import matplotlib.pyplot as plt
 import numpy as np 
 import math
 
@@ -19,27 +18,16 @@ class MainController(object):
         self.__MAXpercentage = 85 # maksymalne wypelnienie
         self.__MINpercentage = 45
         self.__motorOffset = {'L':-5, 'R':5}
-       # self.plotInit()
-
-    #def plotInit(self):
-    #    plt.axis([-3, 1, -1, 3])
-
-    #def plotUpdate(self, x,y, color):
-
-    #    plt.scatter(x,y, c= color)
-    #    plt.pause(0.01)
 
 
     #---------------MAIN PROCESS------------------------------------------
     def mainProcess(self):
         pos = self.__getPosition()
         print(pos)
-        #self.plotUpdate( pos.x,  pos.y, 'red') # update plot
         pathPoint, dist = self.__getClosestPathPoint(pos)
         if not pathPoint :
             self.__stopMotors()
             return {'status': False }
-        #self.plotUpdate( pathPoint.x,  pathPoint.y, 'blue')
         print('Current aim:', str(pathPoint), 'current dist: ', str(dist))
         vel = self.__mainConversion(pos, pathPoint, dist)
         self.__setMotorsPWM(vel)
@@ -78,7 +66,6 @@ class MainController(object):
             path = []
             for line in tempPath:
                 conv_coord = self.__globalToLocalCoordinates(pLoc, Position(x = line[0], y = line[1], angle = line[2] ) )
-             #   self.plotUpdate( conv_coord.x,  conv_coord.y, 'black')
                 print(conv_coord)
                 path.append(conv_coord)
             self.__path = path
@@ -124,8 +111,7 @@ class MainController(object):
             if min_dist == None or min_dist > dist : min_dist, closestPathPoint = dist, pathPoint
 
         if closestPathPoint == self.__path[-1]: return [[], None]
-        if not min_dist == None and min_dist <= self.__margin: # zapobieganie blokowaniu sie na jednym punkcie sciezki
-            #self.__path.remove(closestPathPoint) # usuniecie punktu sciezki ktory jest za blisko
+        if not min_dist == None and min_dist <= self.__margin: # zapobieganie blokowaniu sie na jednym punkcie sciezki      
             closestPathPoint, min_dist = self.__getClosestPathPoint(current_pos) # powtorzenie dzialania funkcji
         
         return [closestPathPoint, min_dist]
