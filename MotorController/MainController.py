@@ -22,6 +22,7 @@ class MainController(object):
 
     #---------------MAIN PROCESS------------------------------------------
     def mainProcess(self):
+        if not self.__path: return {'status': False}
         pos = self.__getPosition()
         print(pos)
         pathPoint, dist = self.__getClosestPathPoint(pos)
@@ -37,8 +38,11 @@ class MainController(object):
 
     #---------------CONVERTION FUNCTIONS------------------------------------------
     # Konwertuje sciezke na sciezke w lokalnym ukladzie wspolrzednych pierwszego punktu sciezki 
-    def addPathPoint(self, point , id):
-        if id == 'POSITION':
+    def addPathPoint(self, point , id):       
+        if id == 'STOP':
+            self.__stopMotors()
+            self.__resetPath()
+        elif id == 'POSITION':
             self.__stopMotors()
             self.__resetPath()
             self.__rawPath.append([point.x, point.y, point.angle])
