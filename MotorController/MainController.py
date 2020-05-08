@@ -42,6 +42,8 @@ class MainController(object):
         if id == 'STOP':
             self.__stopMotors()
             self.__resetPath()
+            del self.__positionControl
+            self.__positionControl = PositionController(self.__motorControler)
         elif id == 'POSITION':
             self.__stopMotors()
             self.__resetPath()
@@ -94,8 +96,11 @@ class MainController(object):
 
     def __percentageConversion(self, V, motor):
         max_value = (math.cos(math.radians(45)) + self.__k_con * math.sin(math.radians(45)))
-        if V <= max_value and V >=0: return int( (((V * self.__MAXpercentage) / max_value)/2) +  self.__MINpercentage ) + self.__motorOffset[motor]
-        elif  V >= -max_value and V <=0: return int( (((V * self.__MAXpercentage) / max_value)/2) -  self.__MINpercentage ) - self.__motorOffset[motor]
+        diff  = self.__MAXpercentage - self.__MINpercentage
+        if V <= max_value and V >=0: return int( (V / max_value)*diff + self.__MINpercentage + self.__motorOffset[motor] )
+        elif  V >= -max_value and V <=0: return-1 * int( (-V / max_value)*diff + self.__MINpercentage + self.__motorOffset[motor] )
+        #if V <= max_value and V >=0: return int( (((V * self.__MAXpercentage) / max_value)/2) +  self.__MINpercentage ) + self.__motorOffset[motor]
+        #elif  V >= -max_value and V <=0: return int( (((V * self.__MAXpercentage) / max_value)/2) -  self.__MINpercentage ) - self.__motorOffset[motor]
         elif V < 0 :  return -self.__MAXpercentage
         else:        return self.__MAXpercentage
 

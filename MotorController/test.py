@@ -5,7 +5,7 @@ import numpy as np
 import time
 
 
-com = MotorControler('COM6')
+com = MotorControler('COM5')
 main = MainController(com)
 
 def addAngle(array):
