@@ -65,3 +65,25 @@ while status:
         break
 
 del com
+
+
+
+
+######### CONTROLER P TEST
+def singleMotorController(Vz,Vp, k):
+    err = Vz-Vp
+    Vout = Vz + (k * err)
+    return Vout
+
+def veloity(vel, k, it=1):
+    Vz = vel
+    VoutL = vel
+    VoutR = vel
+    for i in range(it):
+        com.SetPWMControl( VoutL,  VoutR)
+        raw = com.WaitOnMeasurement(1)
+        vel = {'L': raw[2], 'R': raw[1]}
+        VoutL = singleMotorController(Vz, vel['L'], k)
+        VoutR = singleMotorController(Vz, vel['R'], k)
+
+

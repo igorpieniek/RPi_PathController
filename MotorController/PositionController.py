@@ -26,6 +26,9 @@ class PositionController(object):
         self.__lastLocation = self.__globalCoordinate(self.__lastLocation, SL, SR)
  
         return self.__lastLocation
+
+    def getVelocity(self):
+        return {'L': self.__velocityL, 'R': self.__velocityR}
     #-------------LOW LEVEL CONVERSION FUNCTIONS---------------------------------------------------------------
     def __getSign(self, diff):
         if diff > self.__halfUint16: return -1 # jazda do tylu
@@ -74,6 +77,8 @@ class PositionController(object):
     def __updateMeasurments(self):
         self.__rawData = self.__motorControler.WaitOnMeasurement(5)
         if self.__rawData[0]== False: raise NameError('ODBIOR DANYCH NIE DZIALA') # status could be NONE
+        self.__velocityR = - self.__rawData[1]
+        self.__velocityL = - self.__rawData[2]
         self.__impulsesR = np.uint16(self.__rawData[3])
         self.__impulsesL = np.uint16(self.__rawData[4])
 

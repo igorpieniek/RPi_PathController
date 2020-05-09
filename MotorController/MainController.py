@@ -13,11 +13,12 @@ class MainController(object):
         self.__setMargin()
 
         self.__k_st = 8 # parametr w poprawce stanleya <1,10>
+        self.__kp = 1# parametr P w regulatorze proporcjonalnym
         self.__k_con = 0.7 # parametr przy poprawce sterowania skretu <0.5, 1>
         self.__Vx  = 0.05 # wymagana predkosci pojazdu - przydaje sie przy obliczeniach kata ale nie przy jego zadawniu
         self.__MAXpercentage = 85 # maksymalne wypelnienie
         self.__MINpercentage = 45
-        self.__motorOffset = {'L':-5, 'R':5}
+        self.__motorOffset = {'L':0, 'R':0}
 
 
     #---------------MAIN PROCESS------------------------------------------
@@ -31,10 +32,22 @@ class MainController(object):
             return {'status': False }
         print('Current aim:', str(pathPoint), 'current dist: ', str(dist))
         vel = self.__mainConversion(pos, pathPoint, dist)
+        vel = self.__velocityController(vel)
         self.__setMotorsPWM(vel)
 
         return {'status':True, 'VR': vel['R'], 'VL':vel['L']}
-        
+    #---------------VELOCITY REAGULATOR------------------------------------------ 
+    def __singleMotorController(self,Vz,Vp,k):
+        err = Vz-Vp
+        Vout = Vz + (k * err)
+        return Vout
+
+    def __velocityController(self,Vz):
+        Vp = self.__getVelocity()
+        VoutL = self.__singleMotorController(Vz['L'], Vp['L'], self.__kp)
+        VoutR = self.__singleMotorController(Vz['R'], Vp['R'], self.__kp)
+        return {'L': VoutL, 'R': VoutR}
+
 
     #---------------CONVERTION FUNCTIONS------------------------------------------
     # Konwertuje sciezke na sciezke w lokalnym ukladzie wspolrzednych pierwszego punktu sciezki 
@@ -128,6 +141,9 @@ class MainController(object):
     def __getPosition(self):
         return self.__positionControl.getCoordinates()
 
+    def __getVelocity(self):
+        return self.__positionControl.getVelocity()
+
     def __get2PointsDist(self,x1,y1,x2,y2):
         return math.sqrt((x2 - x1)**2 + (y2 - y1)**2)  
     
@@ -135,6 +151,11 @@ class MainController(object):
         x_out =  (point.x - pointRef.x ) * math.cos( pointRef.angle - math.radians(90) ) + (point.y - pointRef.y) * math.sin( pointRef.angle - math.radians(90)) 
         y_out = -(point.x - pointRef.x ) * math.sin( pointRef.angle - math.radians(90) ) + (point.y - pointRef.y) * math.cos( pointRef.angle - math.radians(90) ) 
         angle_out = point.angle - pointRef.angle  + math.radians(90)
+
+        if math.fmod( int(abs(angle_out)/math.pi),2)==1:
+            angle_out= math.fmod(angle_out,2*math.pi)-(2*math.pi)
+        else: angle_out =  math.fmod(angle_out,math.pi)
+
         return Position(x = x_out, y = y_out, angle = angle_out )
 
    
