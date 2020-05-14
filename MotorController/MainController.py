@@ -25,6 +25,19 @@ class MainController(object):
         self.__prevDist = None
         self.__prevPathPoint = None
 
+        self.__file = open('measurmentLog.txt', 'w')
+
+    def __del__(self):
+        self.__file.close()
+    #---------------LOG DATA ---------------------------------------------
+    def __logWrite(self, pos, pathPoint):
+        toSave = [str(self.__refPos.x), str(self.__refPos.y), str(self.__refPos.angle),
+                  str(pos.x), str(pos.y), str(pos.angle),
+                  str(pathPoint.x), str(pathPoint.y), str(pathPoint.angle),
+                  str(self.__fie)]
+        toSave = ','.join(toSave)
+        self.__file.write( ','.join([str(self.__refPos.x),str(self.__refPos.x)])  )
+
     #---------------MAIN PROCESS------------------------------------------
     def mainProcess(self):
         if not self.__path: return {'status': False}
@@ -37,6 +50,10 @@ class MainController(object):
         if not pathPoint or (dist-self.__prevDist)>0.025:
             self.__stopMotors()
             return {'status': False }
+
+        try: self.__logWrite(pos, pathPoint)
+        except: print('Writting file error: '+ sys.exc_info()[0])
+
         self.__prevDist = dist
         print('Current aim:', str(pathPoint), 'current dist: ', str(round(dist,3)))
         vel = self.__mainConversion(pos, pathPoint, dist)
@@ -90,12 +107,12 @@ class MainController(object):
 
     def __convertPath(self):
         if self.__rawPath:
-            pLoc = Position(x = self.__rawPath[0][0], y = self.__rawPath[0][1], angle =  self.__rawPath[0][2] )
+            self.__refPos = Position(x = self.__rawPath[0][0], y = self.__rawPath[0][1], angle =  self.__rawPath[0][2] )
             print('PATH CONVERSION START')
             tempPath = self.__rawPath[1:]
             path = []
             for line in tempPath:
-                conv_coord = self.__globalToLocalCoordinates(pLoc, Position(x = line[0], y = line[1], angle = line[2] ) )
+                conv_coord = self.__globalToLocalCoordinates(self.__refPos, Position(x = line[0], y = line[1], angle = line[2] ) )
                 print(conv_coord)
                 path.append(conv_coord)
             self.__path = path
@@ -120,9 +137,11 @@ class MainController(object):
         VR =  (math.cos( fi_e) + self.__k_con * math.sin(fi_e))
         VL =  (math.cos(fi_e) - self.__k_con * math.sin(fi_e))
 
+        ##
+        self.__fie = fi_e
         # Konwersja na procenty
-        VR = -1*self.__percentageConversion(VR, 'R')
-        VL = -1*self.__percentageConversion(VL, 'L')
+        VR = -self.__percentageConversion(VR, 'R')
+        VL = -self.__percentageConversion(VL, 'L')
         print('Kontroler out: ',' VL = '+ str(-VL)+ ' VR = '+ str(-VR),' fie= '+ str(math.degrees(fi_e))+ ' delta= '+ str(math.degrees(delta)) )
         return {'R': VR, 'L': VL}
 
