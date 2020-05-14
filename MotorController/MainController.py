@@ -22,8 +22,8 @@ class MainController(object):
         self.__MINpercentage = 40
         self.__motorOffset = {'L':0, 'R':0}
         
-	self.__prevDist = None
-	self.__prevPathPoint = None
+        self.__prevDist = None
+        self.__prevPathPoint = None
 
     #---------------MAIN PROCESS------------------------------------------
     def mainProcess(self):
@@ -31,25 +31,23 @@ class MainController(object):
         pos = self.__getPosition()
         print(pos)
         pathPoint, dist = self.__getClosestPathPoint(pos)
-	if not self.__prevPathPoint== pathPoint: self.__prevDist = None
-	self.__prevPathPoint = pathPoint 
-	if self.__prevDist == None: self.__prevDist= dist
+        if not self.__prevPathPoint== pathPoint: self.__prevDist = None
+        self.__prevPathPoint = pathPoint 
+        if self.__prevDist == None: self.__prevDist= dist
         if not pathPoint or (dist-self.__prevDist)>0.025:
-	    # print('STOPED - prev difference!', dist-self.__prevDist)
+	        # print('STOPED - prev difference!', dist-self.__prevDist)
             self.__stopMotors()
             return {'status': False }
-       	self.__prevDist = dist
-	print('Current aim:', str(pathPoint), 'current dist: ', str(round(dist,3)))
+        self.__prevDist = dist
+        print('Current aim:', str(pathPoint), 'current dist: ', str(round(dist,3)))
         vel = self.__mainConversion(pos, pathPoint, dist)
         vel = self.__velocityController(vel)
-	self.__setMotorsPWM(vel)
-
         return {'status':True, 'VR': vel['R'], 'VL':vel['L']}
         
     #---------------VELOCITY REAGULATOR------------------------------------------ 
     def __singleMotorController(self,Vz,Vp,k):
         if abs(Vp)==0: return int(Vz)
-	err = Vz-Vp
+        err = Vz-Vp
         Vout = Vz + (k * err)
         return int(Vout)
 
@@ -57,18 +55,18 @@ class MainController(object):
         Vp = self.__getVelocity()
         VoutL = self.__singleMotorController(Vz['L'],-Vp['L'], self.__kpL)
         VoutR = self.__singleMotorController(Vz['R'],-Vp['R'], self.__kpR)
-    	print('CurrL: ',round(-Vp['L'],2), 'CurrR: ',round(-Vp['R'],2), 'VL', VoutL, 'VR', VoutR )
+        print('CurrL: ',round(-Vp['L'],2), 'CurrR: ',round(-Vp['R'],2), 'VL', VoutL, 'VR', VoutR )
         return {'L': VoutL, 'R': VoutR}
     #---------------CONVERTION FUNCTIONS------------------------------------------
     # Konwertuje sciezke na sciezke w lokalnym ukladzie wspolrzednych pierwszego punktu sciezki 
     def addPathPoint(self, point , id):
         if id == 'STOP':
-	    self.__stopMotors()
+            self.__stopMotors()
             self.__resetPath()
-	    del self.__positionControl
+            del self.__positionControl
             self.__positionControl = PositionController(self.__motorControler)
-	    print('PROCESS STOPPED BY STOP MSG!')
-	elif id == 'POSITION':
+            print('PROCESS STOPPED BY STOP MSG!')
+        elif id == 'POSITION':
             self.__stopMotors()
             self.__resetPath()
             del self.__positionControl
@@ -80,7 +78,7 @@ class MainController(object):
             print('PATH_END')
             for line in self.__rawPath: print(str(round(line[0],2)), str(line[1]), str(math.degrees(line[2] ) ) )
             self.__prevDist=None
-	    self.__convertPath()
+            self.__convertPath()
             return True
         else: raise NameError('NO SUCH ID NAME AS: '+ id)
 
@@ -108,10 +106,10 @@ class MainController(object):
         self.__margin = 0.15
                                     
     def __mainConversion(self, curentPos, pathPoint, dist):
-	
-	V = self.__getVelocity()
-	Vx = ((-V['R'])+ (-V['L']))*0.5*0.1 
-	if Vx == 0: Vx=0.1
+        V = self.__getVelocity()
+        Vx = ((-V['R'])+ (-V['L']))*0.5*0.1 
+        if Vx == 0: Vx=0.1
+        
         # Stanley
         fi_e = -(curentPos.angle - pathPoint.angle)
         delta = fi_e + math.atan( (self.__k_st * dist) / float(Vx) ) #na ten moment wylaczona ze wzgledu na dziwne wyniki
@@ -136,7 +134,8 @@ class MainController(object):
         elif  V >= -max_value and V <0:return -1 * int( (-V / max_value)*diff + self.__MINpercentage + self.__motorOffset[motor] )
         elif V < 0 :  return -self.__MAXpercentage - self.__motorOffset[motor]
         elif V > 0 :  return self.__MAXpercentage + self.__motorOffset[motor]
-	else: return 0
+        else: return 0
+
     #---------------TOOLS FUNCTIONS------------------------------------------
     def __stopMotors(self):
         self.__setMotorsPWM({'L': 0, 'R': 0})
@@ -155,7 +154,7 @@ class MainController(object):
         if closestPathPoint == self.__path[-1] and min_dist<=self.__margin: return [[], None]
         if not min_dist == None and min_dist <= self.__margin: # zapobieganie blokowaniu sie na jednym punkcie sciezki      
             self.__path.remove(closestPathPoint)
-	    closestPathPoint, min_dist = self.__getClosestPathPoint(current_pos) # powtorzenie dzialania funkcji
+            closestPathPoint, min_dist = self.__getClosestPathPoint(current_pos) # powtorzenie dzialania funkcji
         
         return [closestPathPoint, min_dist]
 
@@ -172,10 +171,10 @@ class MainController(object):
         x_out =  (point.x - pointRef.x ) * math.cos( pointRef.angle - math.radians(90) ) + (point.y - pointRef.y) * math.sin( pointRef.angle - math.radians(90)) 
         y_out = -(point.x - pointRef.x ) * math.sin( pointRef.angle - math.radians(90) ) + (point.y - pointRef.y) * math.cos( pointRef.angle - math.radians(90) ) 
         angle_out = point.angle - pointRef.angle  + math.radians(90)
-      	
-        if math.fmod( int(abs(angle_out)/math.pi),2)==1:
-		 angle_out= math.fmod(angle_out,2*math.pi)-(2*math.pi)
-	else: angle_out =  math.fmod(angle_out,math.pi)
 
-	return Position(x = x_out, y = y_out, angle = angle_out )
+        if math.fmod( int(abs(angle_out)/math.pi),2)==1:
+            angle_out= math.fmod(angle_out,2*math.pi)-(2*math.pi)
+        else: angle_out =  math.fmod(angle_out,math.pi)
+        
+        return Position(x = x_out, y = y_out, angle = angle_out )
 
