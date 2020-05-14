@@ -116,7 +116,7 @@ class MotorControler:
             right_duty = -100
         frame = self.frame_pwm.build(dict(pwm_a=left_duty,pwm_b=right_duty))
         self.serial.write(frame);
-        print("Wyslano dane: ",frame)
+        # print("Wyslano dane: ",frame)
     def GetMeasurements(self):
         return self.parser.get_data()
     def WaitOnMeasurement(self,timeout):
