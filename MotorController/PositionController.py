@@ -24,7 +24,6 @@ class PositionController(object):
         SR = self.__encoderConversion('R') 
         SL = self.__encoderConversion('L')
         self.__lastLocation = self.__globalCoordinate(self.__lastLocation, SL, SR)
- 	    #print('LINE 27: GLOBAL COORD: ', str(self.__lastLocation))
         return self.__lastLocation
 
     def getVelocity(self):
@@ -37,12 +36,10 @@ class PositionController(object):
 
     def __getDiff(self, current, last):
         diff = current - last
-        #print('LINE 36: DIFF '+ str(diff))
         if self.__getSign(diff) +1 : #przyrost dodatni
             numOfImpulses = self.__getSign(diff) * int(diff)  # realna wartosc zwrocona wraz ze znakiem w zaleznosci od kierunku jazdy
         else: #przyrost ujemny
             numOfImpulses = self.__getSign(diff) * int(1 + self.__maxValType - diff)
-            #print('LINE 41: NUMOFIMPULSES: '+ str(numOfImpulses))
         return numOfImpulses
 
     def __getCurrentImpulses(self,motor):
@@ -52,7 +49,6 @@ class PositionController(object):
     def __encoderConversion(self, motor):
         currentImp = self.__getCurrentImpulses(motor)
         S = ( self.__getDiff(currentImp, self.__lastMeasure[motor]) / float(self.__impulsesPerRevolution)) * math.pi* self.__wheelDiameter # imp /imp na obrot *pi* D
-        #print('LINE 51: S: ',str(S))
         self.__lastMeasure[motor] = currentImp
         return S
     #-------------HIGH LEVEL CONVERSION FUNCTIONS---------------------------------------------------------------
@@ -72,7 +68,6 @@ class PositionController(object):
     # okresla aktualna pozycje na podstawie poprzedniej pozycji oraz drogi jaka przebyly kola robota
     def __globalCoordinate(self, lastPos, SL, SR):
         loc = self.__localCoordinate(SL,SR)
-        #	print('LINE 71: LOCAL COORD: ', str(loc))
         x_out = lastPos.x + ( loc.x * math.cos( lastPos.angle - math.radians(90)) ) - (loc.y * math.sin( lastPos.angle - math.radians(90)) )
         y_out = lastPos.y + ( loc.x * math.sin( lastPos.angle - math.radians(90)) ) + (loc.y * math.cos( lastPos.angle - math.radians(90)) )
 
@@ -86,8 +81,6 @@ class PositionController(object):
         self.__velocityL =  self.__rawData[2]       
         self.__impulsesR = np.uint16(self.__rawData[3])
         self.__impulsesL = np.uint16(self.__rawData[4])
-	    #print('ENCODER RAW DATA GET: '+ str( self.__impulsesR)+ ' ' + str( self.__impulsesL))
-
 
 
 class Position(object):

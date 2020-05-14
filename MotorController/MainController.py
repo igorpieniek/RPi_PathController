@@ -35,7 +35,6 @@ class MainController(object):
         self.__prevPathPoint = pathPoint 
         if self.__prevDist == None: self.__prevDist= dist
         if not pathPoint or (dist-self.__prevDist)>0.025:
-	        # print('STOPED - prev difference!', dist-self.__prevDist)
             self.__stopMotors()
             return {'status': False }
         self.__prevDist = dist
