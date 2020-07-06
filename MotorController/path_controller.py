@@ -19,14 +19,13 @@ for i in range(4):
                 print('problem z ustawieniem portu nr'+ str(i))
         else: break
 
-controller = MainController(com)
 status = False
+controller = MainController(com)
 
 def callback(msg):
     global status
     rospy.loginfo('New msg received: '+ msg.header.frame_id)
     status  = controller.addPathPoint(msg.vector, msg.header.frame_id)	
-
 
 def listener():
     global rate
@@ -42,9 +41,10 @@ if __name__ == '__main__':
     print('PATH CONTROLLER INIT DONE!')
     while not rospy.is_shutdown():
        # print("in the while loop")
-        global status, rate
+        global status, rate,controller
         if status:
             output = controller.mainProcess()
            # if not output['status']: rospy.loginfo('Vel_R = '+ str( round( output['VR'], 2 ))+ ' Vel_L = ' + str( round( output['VL'], 2 )) )
-        rate.sleep()
+        rate.sleep() 
+    del controller
 

@@ -8,7 +8,7 @@ class PositionController(object):
         self.__lastLocation = Position(x = 0, y = 0, angle = math.pi/2)
 
         self.__timeout = 1 # timeout do wiadomosci
-        self.__wheelbase = 0.2127 #rozstaw kol w [m]
+        self.__wheelbase = 0.21 #rozstaw kol w [m]
         self.__wheelDiameter = 0.0898 # srednica kola [m]
         self.__impulsesPerRevolution= 1800 # ilosc impulsow enkodera na obrot(przelozenie * ilosc impulsow na obrot walu silnika)
         self.__maxValType = np.iinfo(np.uint16()).max
@@ -24,10 +24,11 @@ class PositionController(object):
         SR = self.__encoderConversion('R') 
         SL = self.__encoderConversion('L')
         self.__lastLocation = self.__globalCoordinate(self.__lastLocation, SL, SR)
+ 	#print('LINE 27: GLOBAL COORD: ', str(self.__lastLocation))
         return self.__lastLocation
 
     def getVelocity(self):
-   	    #self.__updateMeasurments()
+   	#self.__updateMeasurments()
         return {'L': self.__velocityL, 'R': self.__velocityR}
     #-------------LOW LEVEL CONVERSION FUNCTIONS---------------------------------------------------------------
     def __getSign(self, diff):
@@ -36,11 +37,13 @@ class PositionController(object):
 
     def __getDiff(self, current, last):
         diff = current - last
-        if self.__getSign(diff) +1 : #przyrost dodatni
+        #print('LINE 36: DIFF '+ str(diff))
+	if self.__getSign(diff) +1 : #przyrost dodatni
             numOfImpulses = self.__getSign(diff) * int(diff)  # realna wartosc zwrocona wraz ze znakiem w zaleznosci od kierunku jazdy
         else: #przyrost ujemny
             numOfImpulses = self.__getSign(diff) * int(1 + self.__maxValType - diff)
-        return numOfImpulses
+        #print('LINE 41: NUMOFIMPULSES: '+ str(numOfImpulses))
+	return numOfImpulses
 
     def __getCurrentImpulses(self,motor):
         if motor=='L': return self.__impulsesL
@@ -49,7 +52,8 @@ class PositionController(object):
     def __encoderConversion(self, motor):
         currentImp = self.__getCurrentImpulses(motor)
         S = ( self.__getDiff(currentImp, self.__lastMeasure[motor]) / float(self.__impulsesPerRevolution)) * math.pi* self.__wheelDiameter # imp /imp na obrot *pi* D
-        self.__lastMeasure[motor] = currentImp
+        #print('LINE 51: S: ',str(S))
+	self.__lastMeasure[motor] = currentImp
         return S
     #-------------HIGH LEVEL CONVERSION FUNCTIONS---------------------------------------------------------------
     # na podstawie przesuniecia drogi obu kol okresla przemieszczenie wzgledem ostatniego pomiaru
@@ -68,7 +72,8 @@ class PositionController(object):
     # okresla aktualna pozycje na podstawie poprzedniej pozycji oraz drogi jaka przebyly kola robota
     def __globalCoordinate(self, lastPos, SL, SR):
         loc = self.__localCoordinate(SL,SR)
-        x_out = lastPos.x + ( loc.x * math.cos( lastPos.angle - math.radians(90)) ) - (loc.y * math.sin( lastPos.angle - math.radians(90)) )
+        #	print('LINE 71: LOCAL COORD: ', str(loc))
+	x_out = lastPos.x + ( loc.x * math.cos( lastPos.angle - math.radians(90)) ) - (loc.y * math.sin( lastPos.angle - math.radians(90)) )
         y_out = lastPos.y + ( loc.x * math.sin( lastPos.angle - math.radians(90)) ) + (loc.y * math.cos( lastPos.angle - math.radians(90)) )
 
         fi_out = loc.angle + lastPos.angle 
@@ -79,8 +84,10 @@ class PositionController(object):
         if self.__rawData[0]== False: raise NameError('ODBIOR DANYCH NIE DZIALA') # status could be NONE
         self.__velocityR =  self.__rawData[1]
         self.__velocityL =  self.__rawData[2]       
-        self.__impulsesR = np.uint16(self.__rawData[3])
+	self.__impulsesR = np.uint16(self.__rawData[3])
         self.__impulsesL = np.uint16(self.__rawData[4])
+	#print('ENCODER RAW DATA GET: '+ str( self.__impulsesR)+ ' ' + str( self.__impulsesL))
+
 
 
 class Position(object):
